@@ -1,0 +1,32 @@
+config:
+  target: "https://devops.loookit.com/api"
+  phases:
+    - duration: 5
+      arrivalRate: 5
+      name: Warm up
+    # - duration: 60
+    #   arrivalRate: 5
+    #   rampTo: 50
+    #   name: Ramp up load
+    # - duration: 600
+    #   arrivalRate: 50
+    #   name: Sustained load
+  payload:
+    path: "TotalDummyUsersDevop.csv"
+    fields:
+      - "firstName"
+      - "lastName"
+      - "email"
+      - "userPassword"
+      - "agent"
+scenarios:
+  - name: "Create users"
+    flow:
+      - post:
+          url: "/auth/login"
+          body: "username={{ email }},
+                  password={{ userPassword }}"
+          capture:
+            json: "$.data.token"
+            as: "token"
+      - log: "user id is {{token}}"

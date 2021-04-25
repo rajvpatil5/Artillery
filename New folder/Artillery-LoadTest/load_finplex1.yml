@@ -1,0 +1,108 @@
+config:
+  target: "https://finplex-exclosertest.com/api"
+  tls: {
+      "rejectUnauthorized": false
+    }
+
+
+  phases:
+    - duration: 1 # Run scenario for 10 seconds
+      arrivalCount: 1 # Create 20 virtual users per scenario
+	  
+
+scenarios:
+  - engine: "socketio"
+    flow:
+      - post:
+          url: "/auth/login"
+          json:
+            username: "agent1@dummy.com"
+            password: "Test123"
+          capture:
+            json: "$.data.userDetails.token"
+            as: "authToken"
+      - log: "token {{authToken}}"
+      - post:
+          url: "/session/passcode"
+          headers:
+           Authorization: "Bearer {{authToken}}"
+          capture:
+            json: "$.data.passcode"
+            as: "passcode"
+      - log: "passcode {{passcode}}"
+
+      - post:
+          url: "/session/createSession"
+          headers:
+           Authorization: "Bearer {{authToken}}"
+          json:
+            sessionName: "Sha"
+            language: "en"
+          capture:
+            json: "$.data.sessionKey"
+            as: "sessionKey"
+      - log: "sessionKey {{sessionKey}}"
+      - post:
+          url: "/session/joinSession"
+          headers:
+           Authorization: "Bearer {{authToken}}"
+          json:
+            sessionKey: "{{sessionKey}}"
+      - log: "Joined session {{sessionKey}}"
+      - emit:
+          
+          channel: "message"
+          data: "{\"data\":{\"category\":\"SESSION\",\"action\":\"JOIN\",\"userName\":\"Lookit Default\",\"sessionKey\":\"{{sessionKey}}\",\"token\":\"{{authToken}}\"}}"
+          response:
+            channel: "message"
+            capture:
+              json: "$.data.action"
+              as: "joinAction"
+      - log: "joinAction {{joinAction}}"
+      - think: 5
+      - emit:
+          	  
+          channel: "message"
+          data: "{\"data\":{\"category\":\"SESSION\",\"action\":\"GET_ALL_SESSION_DATA\",\"sessionKey\":\"{{sessionKey}}\"}}"
+          response:
+              channel: "message"
+              capture:
+                json: "$.data.action"
+                as: "getAllSessionDataAction"
+      - log: "getAllSessionDataAction {{getAllSessionDataAction}}"
+      - loop:
+        - emit:
+            		
+            channel: "message"
+            data: "{\"data\":{\"category\":\"WHITEBOARD\",\"action\":\"ADD_CANVAS\",\"sessionKey\":\"{{sessionKey}}\",\"canvasType\":\"REGULAR\",\"canvasSource\":\"REGULAR\"}}"
+            response:
+              channel: "message"
+              capture:
+                json: "$.data.canvasId"
+                as: "canvasId"
+        - log: "canvasId {{canvasId}}"
+        #- log: "ADD_CANVAS {{sessionKey}}"
+        - emit:
+            		
+            channel: "message"
+            data: "{\"data\":{\"category\":\"NOTIFICATION\",\"action\":\"ADD_ANNOTATION\",\"annotation\":\"Rectangle\",\"sessionKey\":\"{{sessionKey}}\"}}"
+            response:
+              channel: "message"
+              capture:
+                json: "$.data.action"
+                as: "addAnnotationAction"
+        - log: "addAnnotationAction {{addAnnotationAction}} {{changeActiveCanvasAction}}"
+        - think: 2
+        - emit:
+            
+            channel: "message"
+            data: "{\"data\":{\"category\":\"WHITEBOARD\",\"action\":\"ADD_OBJECT\",\"sessionKey\":\"{{sessionKey}}\",\"canvasId\":{{canvasId}},\"canvasType\":\"REGULAR\",\"activePage\":-1,\"subAction\":\"REGULAR\",\"participantId\":1,\"whiteboardData\":{\"objectType\":\"Rectangle\",\"objectId\":1598292630130,\"canvasObject\":{\"type\":\"rect\",\"version\":\"3.6.3\",\"originX\":\"center\",\"originY\":\"center\",\"left\":1051.07,\"top\":582.37,\"width\":381.59,\"height\":181.54,\"fill\":\"rgba(0,0,0,0)\",\"stroke\":\"black\",\"strokeWidth\":4,\"strokeDashArray\":null,\"strokeLineCap\":\"butt\",\"strokeDashOffset\":0,\"strokeLineJoin\":\"miter\",\"strokeMiterLimit\":4,\"scaleX\":1,\"scaleY\":1,\"angle\":0,\"flipX\":false,\"flipY\":false,\"opacity\":1,\"shadow\":null,\"visible\":true,\"clipTo\":null,\"backgroundColor\":\"\",\"fillRule\":\"nonzero\",\"paintFirst\":\"fill\",\"globalCompositeOperation\":\"source-over\",\"transformMatrix\":null,\"skewX\":0,\"skewY\":0,\"rx\":0,\"ry\":0}}}}"
+            response:
+              channel: "message"
+              capture:
+                json: "$.data.action"
+                as: "addObjectAction"
+        - log: "addObjectAction {{addObjectAction}}"
+        count: 2
+      - think: 9000 # do nothing for 60 seconds, then disconnect
+

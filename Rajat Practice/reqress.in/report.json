@@ -1,0 +1,110 @@
+{
+  "aggregate": {
+    "timestamp": "2021-04-25T06:55:55.891Z",
+    "scenariosCreated": 25,
+    "scenariosCompleted": 25,
+    "requestsCompleted": 25,
+    "latency": {
+      "min": 260,
+      "max": 685,
+      "median": 320,
+      "p95": 640.8,
+      "p99": 685
+    },
+    "rps": {
+      "count": 25,
+      "mean": 4.27
+    },
+    "scenarioDuration": {
+      "min": 495.9,
+      "max": 1122.5,
+      "median": 609.5,
+      "p95": 994.5,
+      "p99": 1122.5
+    },
+    "scenarioCounts": {
+      "Create users": 25
+    },
+    "errors": {},
+    "codes": {
+      "201": 25
+    },
+    "matches": 0,
+    "customStats": {},
+    "counters": {},
+    "scenariosAvoided": 0,
+    "phases": [
+      {
+        "duration": 5,
+        "arrivalRate": 5,
+        "name": "Warm up"
+      }
+    ]
+  },
+  "intermediate": [
+    {
+      "timestamp": "2021-04-25T06:55:55.854Z",
+      "scenariosCreated": 25,
+      "scenariosCompleted": 25,
+      "requestsCompleted": 25,
+      "latency": {
+        "min": 260,
+        "max": 685,
+        "median": 320,
+        "p95": 640.8,
+        "p99": 685
+      },
+      "rps": {
+        "count": 25,
+        "mean": 4.3
+      },
+      "scenarioDuration": {
+        "min": 495.9,
+        "max": 1122.5,
+        "median": 609.5,
+        "p95": 994.5,
+        "p99": 1122.5
+      },
+      "scenarioCounts": {
+        "Create users": 25
+      },
+      "errors": {},
+      "codes": {
+        "201": 25
+      },
+      "matches": 0,
+      "latencies": [
+        471000000,
+        685000000,
+        320000000,
+        626000000,
+        284000000,
+        436000000,
+        462000000,
+        284000000,
+        438000000,
+        329000000,
+        447000000,
+        260000000,
+        437000000,
+        320000000,
+        273000000,
+        311000000,
+        279000000,
+        458000000,
+        279000000,
+        450000000,
+        441000000,
+        286000000,
+        280000000,
+        279000000,
+        270000000
+      ],
+      "customStats": {},
+      "counters": {},
+      "concurrency": 0,
+      "pendingRequests": 0,
+      "scenariosAvoided": 0
+    }
+  ]
+}

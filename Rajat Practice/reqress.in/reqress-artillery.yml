@@ -1,0 +1,29 @@
+config:
+  target: "https://reqres.in"
+  phases:
+    - duration: 5
+      arrivalRate: 5
+      name: Warm up
+    # - duration: 60
+    #   arrivalRate: 5
+    #   rampTo: 50
+    #   name: Ramp up load
+    # - duration: 600
+    #   arrivalRate: 50
+    #   name: Sustained load
+  payload:
+    path: "TotalDummyUsers.csv"
+    fields:
+      - "name"
+      - "job"
+scenarios:
+  - name: "Create users"
+    flow:
+      - post:
+          url: "/api/users"
+          body: "name={{ name }},
+                  job={{ job }}"
+          capture:
+            json: "id"
+            as: "userId"
+      - log: "user id is {{userId}}"

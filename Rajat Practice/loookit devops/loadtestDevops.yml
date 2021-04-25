@@ -1,0 +1,72 @@
+config:
+  target: "https://devops.loookit.com/api"
+  socketio:
+    transports: ["websocket"]
+  tls: {
+      "rejectUnauthorized": false
+    }
+  phases:
+    - duration: 5
+      arrivalRate: 1
+      name: Warm up
+    # - duration: 60
+    #   arrivalRate: 5
+    #   rampTo: 50
+    #   name: Ramp up load
+    # - duration: 600
+    #   arrivalRate: 50
+    #   name: Sustained load
+  payload:
+    path: "TotalDummyUsersDevop.csv"
+    fields:
+      - "firstName"
+      - "lastName"
+      - "email"
+      - "password"
+      - "agent"
+scenarios:
+  - engine: "socketio"
+    flow:
+      - post:
+          url: "/auth/login"
+          json:
+            username: "{{email}}"
+            password: "{{password}}"
+          capture:
+            json: "$.data.userDetails.token"
+            as: "token"
+      - log: "user token is {{token}}"
+      - post:
+          url: "/session/passcode"
+          headers:
+            Authorization: "Bearer {{token}}"
+          capture:
+            json: "$.data.passcode"
+            as: "userPasscode"
+      - log: "user passcode is {{userPasscode}}"
+      - post:
+          url: "/session/createSession"
+          headers:
+            Authorization: "Bearer {{token}}"
+          json:
+            sessionName: "{{firstName}}"
+            language: "en"  
+          capture:
+            json: "$.data.sessionKey"
+            as: "userSessionKey"
+      - log: "user sessionKey is {{userSessionKey}}"
+      - post:
+          url: "/session/joinSession"
+          headers:
+            Authorization: "Bearer {{token}}"
+          json:
+            sessionKey: "{{userSessionKey}}"
+      - emit:
+          channel: "message"
+          data: "{\"data\":{\"category\":\"SESSION\",\"action\":\"JOIN\",\"userName\":\"Lookit Default\",\"sessionKey\":\"{{userSessionKey}}\",\"token\":\"{{token}}\"}}"
+          response:
+            channel: "message"
+            capture:
+              json: "$.data.action"
+              as: "joinAction"
+      - log: "joinAction {{joinAction}}"
